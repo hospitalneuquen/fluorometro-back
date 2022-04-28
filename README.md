@@ -8,6 +8,7 @@ $ npm install
 
 ```bash
 $ cp env.example .env 
+# Edit .env file
 ```
 
 ```bash
