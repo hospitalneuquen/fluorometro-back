@@ -1,13 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkorderService } from './workorder.service';
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import { Connection } from 'typeorm';
 import { WorkOrderEntity } from 'src/entities/workOrderEntity';
 import { WorkOrder } from 'src/entities/workOrder';
 
-const moduleMocker = new ModuleMocker(global);
-
-describe('Unit testings', () => {
+describe('Workorder service unit tests', () => {
   let service: WorkorderService;
 
   beforeEach(async () => {
