@@ -50,8 +50,7 @@ export class WorkorderService {
 
   processWorkOrderList(orders: WorkOrderEntity[]): WorkOrder[] {
     const groupedOrders = this.groupOrdersByNumber(orders);
-    // return this.prioritizeGroupedOrders(groupedOrders);
-    return groupedOrders;
+    return this.prioritizeGroupedOrders(groupedOrders);
   }
 
   async getWorkOrders(params: FindWorkOrdersParams): Promise<WorkOrder[]> {
