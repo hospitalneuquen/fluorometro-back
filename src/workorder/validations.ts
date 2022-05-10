@@ -18,4 +18,12 @@ export class FindWorkOrdersParams {
   numberFrom?: number;
   numberTo?: number;
   sinceNumber?: number;
+
+  public constructor(listParams: ListParams) {
+    this.dateFrom = listParams.dateFrom;
+    this.dateTo = listParams.dateTo;
+    this.numberFrom = listParams.numberFrom;
+    this.dateTo = listParams.dateTo;
+    this.sinceNumber = listParams.sinceNumber;
+  }
 }

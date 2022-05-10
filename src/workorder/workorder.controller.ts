@@ -9,9 +9,12 @@ export class WorkorderController {
   constructor(private readonly service: WorkorderService) {}
 
   @Get()
-  @ApiResponse({ status: 200, description: 'Ordenes de trabajo ordenadas por prioridad' })
+  @ApiResponse({
+    status: 200,
+    description: 'Ordenes de trabajo ordenadas por prioridad',
+  })
   getWorkOrders(@Query() params: ListParams): Promise<WorkOrder[]> {
-    const findParams: FindWorkOrdersParams = params;
+    const findParams: FindWorkOrdersParams = new FindWorkOrdersParams(params);
     return this.service.getWorkOrders(findParams);
   }
 }
