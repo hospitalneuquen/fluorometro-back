@@ -55,11 +55,13 @@ export class WorkorderService {
 
   async getWorkOrders(params: FindWorkOrdersParams): Promise<WorkOrder[]> {
     //LAB_GeneraHT(:@fechaDesde, :@fechaHasta, :@idHojaTrabajo, :@idEfectorSolicitante, :@idOrigen, :@idPrioridad, :@idSector, :@estado, :@numeroDesde, :@numeroHasta, :@desdeUltimoNumero)
+    const PESQUISA_CODE = 72;
     const workOrders: WorkOrderEntity[] = await this.connection.query(
-      'EXEC LAB_GeneraHT @0, @1, 72, null, null, null, null, null, @2, @3, @4',
+      'EXEC LAB_GeneraHT @0, @1, @2, null, null, null, null, null, @3, @4, @5',
       [
         params.dateFrom,
         params.dateTo,
+        PESQUISA_CODE,
         params.numberFrom || null,
         params.numberTo || null,
         params.sinceNumber || null,
