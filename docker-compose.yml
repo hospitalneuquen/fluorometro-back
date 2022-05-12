@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo:4-focal
+    environment:
+      MONGO_INITDB_USERNAME: user_fluorometro
+      MONGO_INITDB_ROOT_PASSWORD: pass_fluorometro
+
