@@ -3,6 +3,10 @@ services:
   mongo:
     image: mongo:4-focal
     environment:
-      MONGO_INITDB_USERNAME: user_fluorometro
-      MONGO_INITDB_ROOT_PASSWORD: pass_fluorometro
-
+      - MONGO_INITDB_ROOT_USERNAME=user_fluorometro
+      - MONGO_INITDB_ROOT_PASSWORD=pass_fluorometro
+      - MONGO_INITDB_DATABASE=fluorometro
+    volumes:
+      - ./docker/init-mongo/create-db.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - 27017:27017

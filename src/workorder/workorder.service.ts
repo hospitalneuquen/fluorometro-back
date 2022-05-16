@@ -4,10 +4,13 @@ import { WorkOrderEntity } from 'src/entities/workOrderEntity';
 import { Connection } from 'typeorm';
 import { FindWorkOrdersParams } from './validations';
 import * as R from 'ramda';
+import { InjectConnection } from '@nestjs/typeorm';
 
 @Injectable()
 export class WorkorderService {
-  constructor(private readonly connection: Connection) {}
+  constructor(
+    @InjectConnection('sips') private readonly connection: Connection,
+  ) {}
 
   convertWorkOrderEntityToWorkOrder(order: WorkOrderEntity): WorkOrder {
     const response: WorkOrder = {
