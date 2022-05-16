@@ -1,6 +1,7 @@
 ## Fluorometro Backend
 
-### Steps to start 
+### First time
+
 
 ```bash
 $ npm install
@@ -9,6 +10,14 @@ $ npm install
 ```bash
 $ cp env.example .env 
 # Edit .env file
+```
+
+### Everyday
+
+Start mongo server using docker-compose. No disk persistence is used. 
+
+```bash
+$ docker-compose up
 ```
 
 ```bash
