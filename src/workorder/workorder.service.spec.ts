@@ -4,6 +4,8 @@ import { Connection } from 'typeorm';
 import { WorkOrderEntity } from 'src/entities/workOrderEntity';
 import { WorkOrder } from 'src/entities/workOrder';
 
+const TOKEN_NAME = 'sipsConnection';
+
 describe('Workorder service unit tests', () => {
   let service: WorkorderService;
 
@@ -12,7 +14,7 @@ describe('Workorder service unit tests', () => {
       providers: [WorkorderService],
     })
       .useMocker((token) => {
-        if (token == Connection) {
+        if (token == TOKEN_NAME) {
           return {
             query: (params: any) => {
               return [];
@@ -334,7 +336,7 @@ describe('Test from getWorkOrders', () => {
       providers: [WorkorderService],
     })
       .useMocker((token) => {
-        if (token == Connection) {
+        if (token == TOKEN_NAME) {
           return {
             query: (params: any) => {
               return [];
