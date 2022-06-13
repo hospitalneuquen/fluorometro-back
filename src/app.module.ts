@@ -7,7 +7,13 @@ import { SharedModule } from './shared/shared.module';
 import { HealthModule } from './health/health.module';
 
 @Module({
-  imports: [WorklistModule, WorkorderModule, ResultsModule, SharedModule, HealthModule],
+  imports: [
+    WorklistModule,
+    WorkorderModule,
+    ResultsModule,
+    SharedModule,
+    HealthModule,
+  ],
   controllers: [],
   providers: [AppService],
 })
