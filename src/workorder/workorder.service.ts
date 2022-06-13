@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WorkOrder, WorkOrderItem } from 'src/entities/workOrder';
-import { WorkOrderEntity } from 'src/entities/workOrderEntity';
+import { LaboratoryLineEntity } from 'src/entities/LaboratoryLineEntity';
 import { Connection } from 'typeorm';
 import { FindWorkOrdersParams } from './validations';
 import * as R from 'ramda';
@@ -12,7 +12,7 @@ export class WorkorderService {
     @InjectConnection('sips') private readonly connection: Connection,
   ) {}
 
-  convertWorkOrderEntityToWorkOrder(order: WorkOrderEntity): WorkOrder {
+  convertLaboratoryLineEntityToWorkOrder(order: LaboratoryLineEntity): WorkOrder {
     const response: WorkOrder = {
       ...R.omit(['item', 'cantidad'], order),
       items: [{ item: order.item, cantidad: order.cantidad }],
@@ -20,14 +20,14 @@ export class WorkorderService {
     return response;
   }
 
-  groupOrdersByNumber(orders: WorkOrderEntity[]): WorkOrder[] {
+  groupOrdersByNumber(orders: LaboratoryLineEntity[]): WorkOrder[] {
     return orders.reduce((acc, aOrder) => {
       const workOrder: WorkOrder = acc.find(
         (item: WorkOrder) => item.numero == aOrder.numero,
       );
       workOrder
         ? workOrder.items.push({ item: aOrder.item, cantidad: aOrder.cantidad })
-        : acc.push(this.convertWorkOrderEntityToWorkOrder(aOrder));
+        : acc.push(this.convertLaboratoryLineEntityToWorkOrder(aOrder));
       return acc;
     }, []);
   }
@@ -51,7 +51,7 @@ export class WorkorderService {
     return R.sort(fnCompareByPriority, groupedOrders);
   }
 
-  processWorkOrderList(orders: WorkOrderEntity[]): WorkOrder[] {
+  processWorkOrderList(orders: LaboratoryLineEntity[]): WorkOrder[] {
     const groupedOrders = this.groupOrdersByNumber(orders);
     return this.prioritizeGroupedOrders(groupedOrders);
   }
@@ -59,7 +59,7 @@ export class WorkorderService {
   async getWorkOrders(params: FindWorkOrdersParams): Promise<WorkOrder[]> {
     //LAB_GeneraHT(:@fechaDesde, :@fechaHasta, :@idHojaTrabajo, :@idEfectorSolicitante, :@idOrigen, :@idPrioridad, :@idSector, :@estado, :@numeroDesde, :@numeroHasta, :@desdeUltimoNumero)
     const PESQUISA_CODE = 72;
-    const workOrders: WorkOrderEntity[] = await this.connection.query(
+    const workOrders: LaboratoryLineEntity[] = await this.connection.query(
       'EXEC LAB_GeneraHT @0, @1, @2, null, null, null, null, null, @3, @4, @5',
       [
         params.dateFrom,

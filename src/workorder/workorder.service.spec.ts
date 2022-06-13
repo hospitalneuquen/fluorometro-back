@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkorderService } from './workorder.service';
-import { Connection } from 'typeorm';
-import { WorkOrderEntity } from 'src/entities/workOrderEntity';
+import { LaboratoryLineEntity } from 'src/entities/LaboratoryLineEntity';
 import { WorkOrder } from 'src/entities/workOrder';
 
 const TOKEN_NAME = 'sipsConnection';
@@ -26,8 +25,8 @@ describe('Workorder service unit tests', () => {
     service = module.get<WorkorderService>(WorkorderService);
   });
 
-  it('test convertWorkOrderEntityToWorkOrder', () => {
-    const input: WorkOrderEntity = {
+  it('test convertLaboratoryLineEntityToWorkOrder', () => {
+    const input: LaboratoryLineEntity = {
       letra: 'a',
       numero: 1234,
       numeroOrigen: 'numeroOrigen',
@@ -54,7 +53,7 @@ describe('Workorder service unit tests', () => {
       cantidad: '1',
     };
 
-    const output: WorkOrder = service.convertWorkOrderEntityToWorkOrder(input);
+    const output: WorkOrder = service.convertLaboratoryLineEntityToWorkOrder(input);
     expect(output.letra).toEqual('a');
     expect(output.numero).toEqual(1234);
     expect(output.orden).toEqual(3344);
@@ -66,7 +65,7 @@ describe('Workorder service unit tests', () => {
   });
 
   it('test groupOrdersByNumber', () => {
-    const input: Array<WorkOrderEntity> = [
+    const input: Array<LaboratoryLineEntity> = [
       {
         letra: 'a',
         numero: 1234,

@@ -1,6 +1,6 @@
 import { WorkOrderBase } from './workOrderBase';
 
-export interface WorkOrderEntity extends WorkOrderBase {
+export interface LaboratoryLineEntity extends WorkOrderBase {
   item: string;
   cantidad: string;
 }
