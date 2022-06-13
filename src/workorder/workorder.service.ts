@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WorkOrder, WorkOrderItem } from 'src/entities/workOrder';
-import { LaboratoryLineEntity } from 'src/entities/LaboratoryLineEntity';
+import { LaboratoryLineEntity } from 'src/entities/laboratoryLineEntity';
 import { Connection } from 'typeorm';
 import { FindWorkOrdersParams } from './validations';
 import * as R from 'ramda';

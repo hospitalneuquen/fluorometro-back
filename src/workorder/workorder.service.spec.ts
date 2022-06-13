@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkorderService } from './workorder.service';
-import { LaboratoryLineEntity } from 'src/entities/LaboratoryLineEntity';
+import { LaboratoryLineEntity } from 'src/entities/laboratoryLineEntity';
 import { WorkOrder } from 'src/entities/workOrder';
 
 const TOKEN_NAME = 'sipsConnection';
