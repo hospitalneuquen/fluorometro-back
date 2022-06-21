@@ -10,7 +10,7 @@ export class ListParams {
   sinceNumber?: number;
 }
 
-export class FindWorkOrdersParams {
+export class FindProtocolosParams {
   @IsNotEmpty()
   dateFrom: string;
   @IsNotEmpty()

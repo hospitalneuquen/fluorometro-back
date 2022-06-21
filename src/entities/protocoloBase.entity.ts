@@ -1,4 +1,4 @@
-export interface WorkOrderBase {
+export class ProtocoloBase {
   letra: string;
   numero: number;
   numeroOrigen: string;

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WorkorderService } from './workorder.service';
-import { LaboratoryLineEntity } from 'src/entities/laboratoryLineEntity';
-import { WorkOrder } from 'src/entities/workOrder';
+import { Protocolo } from 'src/entities/protocolo.entity';
+import { ProtocoloLine } from 'src/entities/protocoloLine.entity';
+import { ProtocoloService } from './protocolo.service';
 
 const TOKEN_NAME = 'sipsConnection';
 
 describe('Workorder service unit tests', () => {
-  let service: WorkorderService;
+  let service: ProtocoloService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [WorkorderService],
+      providers: [ProtocoloService],
     })
       .useMocker((token) => {
         if (token == TOKEN_NAME) {
@@ -22,11 +22,11 @@ describe('Workorder service unit tests', () => {
         }
       })
       .compile();
-    service = module.get<WorkorderService>(WorkorderService);
+    service = module.get<ProtocoloService>(ProtocoloService);
   });
 
-  it('test convertLaboratoryLineEntityToWorkOrder', () => {
-    const input: LaboratoryLineEntity = {
+  it('test convertLaboratoryLineEntityToProtocolo', () => {
+    const input: ProtocoloLine = {
       letra: 'a',
       numero: 1234,
       numeroOrigen: 'numeroOrigen',
@@ -53,7 +53,8 @@ describe('Workorder service unit tests', () => {
       cantidad: '1',
     };
 
-    const output: WorkOrder = service.convertLaboratoryLineEntityToWorkOrder(input);
+    const output: Protocolo =
+      service.convertLaboratoryLineEntityToProtocolo(input);
     expect(output.letra).toEqual('a');
     expect(output.numero).toEqual(1234);
     expect(output.orden).toEqual(3344);
@@ -65,7 +66,7 @@ describe('Workorder service unit tests', () => {
   });
 
   it('test groupOrdersByNumber', () => {
-    const input: Array<LaboratoryLineEntity> = [
+    const input: Array<ProtocoloLine> = [
       {
         letra: 'a',
         numero: 1234,
@@ -173,14 +174,14 @@ describe('Workorder service unit tests', () => {
       },
     ];
 
-    const output: Array<WorkOrder> = service.groupOrdersByNumber(input);
+    const output: Array<Protocolo> = service.groupOrdersByNumber(input);
     expect(output.length).toEqual(2);
     expect(output[0].items.length).toEqual(3);
     expect(output[1].items.length).toEqual(1);
   });
 
   it('test prioritizeGroupedOrders', () => {
-    const input: Array<WorkOrder> = [
+    const input: Array<Protocolo> = [
       {
         letra: 'A',
         numeroOrigen: '-57770',
@@ -205,14 +206,14 @@ describe('Workorder service unit tests', () => {
         idprotocolo: 1438132,
         medico: '',
         items: [
-          { item: 'TSH', cantidad: '___' },
-          { item: 'PKU ', cantidad: '___' },
-          { item: 'TIR ', cantidad: '___' },
-          { item: '17-OH-P', cantidad: '___' },
-          { item: 'GAL', cantidad: '___' },
-          { item: 'BIOT', cantidad: '___' },
-          { item: 'MSUD', cantidad: '___' },
-          { item: 'Monitoreo PKU', cantidad: 'xxx' },
+          { item: 'TSH', cantidad: '___', disabled: false },
+          { item: 'PKU ', cantidad: '___', disabled: false },
+          { item: 'TIR ', cantidad: '___', disabled: false },
+          { item: '17-OH-P', cantidad: '___', disabled: false },
+          { item: 'GAL', cantidad: '___', disabled: false },
+          { item: 'BIOT', cantidad: '___', disabled: false },
+          { item: 'MSUD', cantidad: '___', disabled: false },
+          { item: 'Monitoreo PKU', cantidad: 'xxx', disabled: true },
         ],
       },
       {
@@ -239,14 +240,14 @@ describe('Workorder service unit tests', () => {
         idprotocolo: 1438125,
         medico: '',
         items: [
-          { item: 'TSH', cantidad: 'xxx' },
-          { item: 'PKU ', cantidad: 'xxx' },
-          { item: 'TIR ', cantidad: 'xxx' },
-          { item: '17-OH-P', cantidad: 'xxx' },
-          { item: 'GAL', cantidad: 'xxx' },
-          { item: 'BIOT', cantidad: 'xxx' },
-          { item: 'MSUD', cantidad: 'xxx' },
-          { item: 'Monitoreo PKU', cantidad: '___' },
+          { item: 'TSH', cantidad: 'xxx', disabled: true },
+          { item: 'PKU ', cantidad: 'xxx', disabled: true },
+          { item: 'TIR ', cantidad: 'xxx', disabled: true },
+          { item: '17-OH-P', cantidad: 'xxx', disabled: true },
+          { item: 'GAL', cantidad: 'xxx', disabled: true },
+          { item: 'BIOT', cantidad: 'xxx', disabled: true },
+          { item: 'MSUD', cantidad: 'xxx', disabled: true },
+          { item: 'Monitoreo PKU', cantidad: '___', disabled: false },
         ],
       },
       {
@@ -273,14 +274,14 @@ describe('Workorder service unit tests', () => {
         idprotocolo: 1438127,
         medico: '',
         items: [
-          { item: 'TSH', cantidad: 'xxx' },
-          { item: 'PKU ', cantidad: 'xxx' },
-          { item: 'TIR ', cantidad: 'xxx' },
-          { item: '17-OH-P', cantidad: 'xxx' },
-          { item: 'GAL', cantidad: 'xxx' },
-          { item: 'BIOT', cantidad: 'xxx' },
-          { item: 'MSUD', cantidad: 'xxx' },
-          { item: 'Monitoreo PKU', cantidad: '___' },
+          { item: 'TSH', cantidad: 'xxx', disabled: true },
+          { item: 'PKU ', cantidad: 'xxx', disabled: true },
+          { item: 'TIR ', cantidad: 'xxx', disabled: true },
+          { item: '17-OH-P', cantidad: 'xxx', disabled: true },
+          { item: 'GAL', cantidad: 'xxx', disabled: true },
+          { item: 'BIOT', cantidad: 'xxx', disabled: true },
+          { item: 'MSUD', cantidad: 'xxx', disabled: true },
+          { item: 'Monitoreo PKU', cantidad: '___', disabled: false },
         ],
       },
       {
@@ -307,18 +308,18 @@ describe('Workorder service unit tests', () => {
         idprotocolo: 1438133,
         medico: '',
         items: [
-          { item: 'TSH', cantidad: '___' },
-          { item: 'PKU ', cantidad: '___' },
-          { item: 'TIR ', cantidad: '___' },
-          { item: '17-OH-P', cantidad: '___' },
-          { item: 'GAL', cantidad: '___' },
-          { item: 'BIOT', cantidad: '___' },
-          { item: 'MSUD', cantidad: '___' },
-          { item: 'Monitoreo PKU', cantidad: 'xxx' },
+          { item: 'TSH', cantidad: '___', disabled: false },
+          { item: 'PKU ', cantidad: '___', disabled: false },
+          { item: 'TIR ', cantidad: '___', disabled: false },
+          { item: '17-OH-P', cantidad: '___', disabled: false },
+          { item: 'GAL', cantidad: '___', disabled: false },
+          { item: 'BIOT', cantidad: '___', disabled: false },
+          { item: 'MSUD', cantidad: '___', disabled: false },
+          { item: 'Monitoreo PKU', cantidad: 'xxx', disabled: true },
         ],
       },
     ];
-    const output: Array<WorkOrder> = service.prioritizeGroupedOrders(input);
+    const output: Array<Protocolo> = service.prioritizeGroupedOrders(input);
     expect(output.length).toEqual(4);
     expect(output[0].numero).toEqual(1353816);
     expect(output[1].numero).toEqual(1353818);
@@ -327,12 +328,12 @@ describe('Workorder service unit tests', () => {
   });
 });
 
-describe('Test from getWorkOrders', () => {
-  let service: WorkorderService;
+describe('Test from getProtocolos', () => {
+  let service: ProtocoloService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [WorkorderService],
+      providers: [ProtocoloService],
     })
       .useMocker((token) => {
         if (token == TOKEN_NAME) {
@@ -344,10 +345,10 @@ describe('Test from getWorkOrders', () => {
         }
       })
       .compile();
-    service = module.get<WorkorderService>(WorkorderService);
+    service = module.get<ProtocoloService>(ProtocoloService);
   });
 
-  it('Test getWorkOrders', () => {
-    service.getWorkOrders({ dateFrom: '2022-01-01', dateTo: '2022-01-02' });
+  it('Test getProtocolos', () => {
+    service.getProtocolos({ dateFrom: '2022-01-01', dateTo: '2022-01-02' });
   });
 });
