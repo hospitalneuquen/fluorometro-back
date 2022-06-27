@@ -24,6 +24,13 @@ describe('OrdenTrabajoService', () => {
             },
           };
         }
+        if (token == "fluorometro_OrdenTrabajoRepository") {
+          return {
+            query: (params: any) => {
+              return [];
+            },
+          };
+        }
       })
       .compile();
     service = module.get<OrdenTrabajoService>(OrdenTrabajoService);
@@ -34,7 +41,7 @@ describe('OrdenTrabajoService', () => {
   });
 
   it('Create workorder with using new protocols', async () => {
-    const expectedResult: Promise<Protocolo[]> = Promise.resolve([
+    const protocolListExpected: Protocolo[] = [
       {
         letra: 'A',
         numeroOrigen: '-57770',
@@ -171,16 +178,18 @@ describe('OrdenTrabajoService', () => {
           { item: 'Monitoreo PKU', cantidad: 'xxx', disabled: true },
         ],
       },
-    ]);
+    ];
+    const expectedResult: Promise<Protocolo[]> =
+      Promise.resolve(protocolListExpected);
     jest
       .spyOn(service, 'getProtocols')
       .mockImplementation(() => expectedResult);
     jest.spyOn(service, 'save').mockImplementation((workOrderToSave) => {
-      expect(workOrderToSave).toBe(expectedResult);
-      return expectedResult;
+      expect(workOrderToSave.protocolos).toBe(protocolListExpected);
+      return Promise.resolve(workOrderToSave);
     });
     const input = { dateFrom: '2022-01-01', dateTo: '2022-01-02' };
     const output = await service.createWorkOrder(input);
-    expect(output.length).toEqual(4);
+    expect(output.protocolos.length).toEqual(4);
   });
 });
