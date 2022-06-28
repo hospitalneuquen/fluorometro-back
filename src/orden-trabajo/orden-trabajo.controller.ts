@@ -17,14 +17,13 @@ export class OrdenTrabajoController {
     description: 'Protocolos ordenados por prioridad',
   })
   async getProtocolos(@Query() params: ListParams): Promise<Protocolo[]> {
-    const protocols = await this.service.getProtocols(params);
-    return protocols;
+    return this.service.getProtocols(params);
   }
 
   @Post()
   @ApiResponse({
     status: 200,
-    description: 'Protocolos ordenados por prioridad',
+    description: 'Crea una orden de trabajo a partir de los protocolos disponibles',
   })
   async addOrdenTrabajo(@Query() params: ListParams): Promise<OrdenTrabajo> {
     return this.service.createWorkOrder(params);
