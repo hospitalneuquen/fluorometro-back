@@ -40,7 +40,9 @@ describe('OrdenTrabajoService', () => {
     expect(service).toBeDefined();
   });
 
-  it('Create workorder with using new protocols', async () => {
+  it('Create workorder using new protocols', async () => {
+    const DATE_FROM = '2022-01-01'
+    const DATE_TO = '2022-01-01'
     const protocolListExpected: Protocolo[] = [
       {
         letra: 'A',
@@ -181,14 +183,17 @@ describe('OrdenTrabajoService', () => {
     ];
     const expectedResult: Promise<Protocolo[]> =
       Promise.resolve(protocolListExpected);
+    
     jest
       .spyOn(service, 'getProtocols')
       .mockImplementation(() => expectedResult);
     jest.spyOn(service, 'save').mockImplementation((workOrderToSave) => {
+      expect(workOrderToSave.fecha_desde).toEqual(DATE_FROM)
+      expect(workOrderToSave.fecha_hasta).toEqual(DATE_TO)
       expect(workOrderToSave.protocolos).toBe(protocolListExpected);
       return Promise.resolve(workOrderToSave);
     });
-    const input = { dateFrom: '2022-01-01', dateTo: '2022-01-02' };
+    const input = { dateFrom: DATE_FROM, dateTo: DATE_TO };
     const output = await service.createWorkOrder(input);
     expect(output.protocolos.length).toEqual(4);
   });
