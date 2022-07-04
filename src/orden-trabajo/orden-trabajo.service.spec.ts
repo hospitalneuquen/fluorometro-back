@@ -1,5 +1,10 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import moment from 'moment';
+import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { Protocolo } from 'src/entities/protocolo.entity';
+import { FindProtocolosParams } from 'src/protocolo/validations';
+import { Repository } from 'typeorm';
 import { ProtocoloModule } from '../protocolo/protocolo.module';
 import { ProtocoloService } from '../protocolo/protocolo.service';
 import { OrdenTrabajoService } from './orden-trabajo.service';
@@ -8,8 +13,9 @@ const TOKEN_NAME = 'sipsConnection';
 describe('OrdenTrabajoService', () => {
   let service: OrdenTrabajoService;
   let protocoloService: ProtocoloService;
+  let repository: Repository<OrdenTrabajo>;
 
-  beforeEach(async () => {
+  async function init({ getManyResponse }: { getManyResponse?: Array<any> }) {
     const module: TestingModule = await Test.createTestingModule({
       providers: [OrdenTrabajoService, ProtocoloModule],
     })
@@ -24,25 +30,35 @@ describe('OrdenTrabajoService', () => {
             },
           };
         }
-        if (token == "fluorometro_OrdenTrabajoRepository") {
+        if (token == 'fluorometro_OrdenTrabajoRepository') {
+          const createQueryBuilder: any = {
+            select: () => createQueryBuilder,
+            where: () => createQueryBuilder,
+            getMany: jest
+              .fn()
+              .mockReturnValueOnce(Promise.resolve(getManyResponse || [])),
+          };
           return {
             query: (params: any) => {
               return [];
             },
+            createQueryBuilder: () => createQueryBuilder,
           };
         }
       })
       .compile();
     service = module.get<OrdenTrabajoService>(OrdenTrabajoService);
-  });
+  }
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
+    await init({});
     expect(service).toBeDefined();
   });
 
   it('Create workorder using new protocols', async () => {
-    const DATE_FROM = '2022-01-01'
-    const DATE_TO = '2022-01-01'
+    await init({});
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = '2022-01-01';
     const protocolListExpected: Protocolo[] = [
       {
         letra: 'A',
@@ -183,18 +199,153 @@ describe('OrdenTrabajoService', () => {
     ];
     const expectedResult: Promise<Protocolo[]> =
       Promise.resolve(protocolListExpected);
-    
+
     jest
       .spyOn(service, 'getProtocols')
       .mockImplementation(() => expectedResult);
     jest.spyOn(service, 'save').mockImplementation((workOrderToSave) => {
-      expect(workOrderToSave.fecha_desde).toEqual(DATE_FROM)
-      expect(workOrderToSave.fecha_hasta).toEqual(DATE_TO)
+      expect(workOrderToSave.fecha_desde).toEqual(DATE_FROM);
+      expect(workOrderToSave.fecha_hasta).toEqual(DATE_TO);
       expect(workOrderToSave.protocolos).toBe(protocolListExpected);
       return Promise.resolve(workOrderToSave);
     });
     const input = { dateFrom: DATE_FROM, dateTo: DATE_TO };
     const output = await service.createWorkOrder(input);
     expect(output.protocolos.length).toEqual(4);
+  });
+
+  it('findOverlapsWith - without overlaps', async () => {
+    await init({});
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = '2022-01-01';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    const response = await service.findOverlapsWith(params);
+    expect(response.length).toBe(0);
+  });
+
+  it('findOverlapsWith - with overlaps', async () => {
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = '2022-01-01';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    await init({ getManyResponse: [{ id: '123456', fecha_desde: DATE_FROM }] });
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    const response = await service.findOverlapsWith(params);
+    expect(response.length).toBe(1);
+  });
+
+  it('canCreateWorkOrder - without overlaps', async () => {
+    await init({});
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = '2022-01-01';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    await service.canCreateWorkOrder(params);
+  });
+
+  it('canCreateWorkOrder - with overlaps (it shouldnt create a work order)', async () => {
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = '2022-01-01';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    await init({ getManyResponse: [{ id: '123456', fecha_desde: DATE_FROM }] });
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    service.canCreateWorkOrder(params).catch((err) => {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect(err.message).toBe('overlapped');
+    });
+  });
+
+  it('canCreateWorkOrder - validate - must be at least 1 day back the date_to', async () => {
+    const DATE_FROM = '2022-01-01';
+    const DATE_TO = moment().format('YYYY-MM-DD');
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    await init({});
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    service.canCreateWorkOrder(params).catch((err) => {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect(err.message).toBe('dateToCannotBeToday');
+    });
+  });
+
+  it('canCreateWorkOrder - validate - date_from must be before or equal date_to', async () => {
+    const DATE_FROM = '2022-05-06';
+    const DATE_TO = '2022-05-05';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    await init({});
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    service.canCreateWorkOrder(params).catch((err) => {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect(err.message).toBe('dateFromCannotBeBeforeDateTo');
+    });
+  });
+
+  it('canCreateWorkOrder - validate - numberFrom must be less or equal numberTo', async () => {
+    const DATE_FROM = '2022-05-01';
+    const DATE_TO = '2022-05-05';
+    const NUMBER_FROM = 102;
+    const NUMBER_TO = 101;
+    await init({});
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    service.canCreateWorkOrder(params).catch((err) => {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect(err.message).toBe('numberFromMustBeLessThanNumberTo');
+    });
+  });
+  it('canCreateWorkOrder - validate - date_from can be equal to date_to', async () => {
+    const DATE_FROM = '2022-05-06';
+    const DATE_TO = '2022-05-06';
+    const NUMBER_FROM = 100;
+    const NUMBER_TO = 150;
+    await init({});
+    const params: FindProtocolosParams = {
+      dateFrom: DATE_FROM,
+      dateTo: DATE_TO,
+      numberFrom: NUMBER_FROM,
+      numberTo: NUMBER_TO,
+    };
+    service.canCreateWorkOrder(params).then((_) => {
+      expect(1).toBe(1);
+    });
   });
 });

@@ -23,7 +23,8 @@ export class OrdenTrabajoController {
   @Post()
   @ApiResponse({
     status: 200,
-    description: 'Crea una orden de trabajo a partir de los protocolos disponibles',
+    description:
+      'Crea una orden de trabajo a partir de los protocolos disponibles',
   })
   async addOrdenTrabajo(@Query() params: ListParams): Promise<OrdenTrabajo> {
     return this.service.createWorkOrder(params);
