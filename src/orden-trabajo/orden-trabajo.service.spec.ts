@@ -1,10 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import moment from 'moment';
-import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
+import * as moment from 'moment';
 import { Protocolo } from 'src/entities/protocolo.entity';
 import { FindProtocolosParams } from 'src/protocolo/validations';
-import { Repository } from 'typeorm';
 import { ProtocoloModule } from '../protocolo/protocolo.module';
 import { ProtocoloService } from '../protocolo/protocolo.service';
 import { OrdenTrabajoService } from './orden-trabajo.service';
@@ -12,8 +10,6 @@ import { OrdenTrabajoService } from './orden-trabajo.service';
 const TOKEN_NAME = 'sipsConnection';
 describe('OrdenTrabajoService', () => {
   let service: OrdenTrabajoService;
-  let protocoloService: ProtocoloService;
-  let repository: Repository<OrdenTrabajo>;
 
   async function init({ getManyResponse }: { getManyResponse?: Array<any> }) {
     const module: TestingModule = await Test.createTestingModule({

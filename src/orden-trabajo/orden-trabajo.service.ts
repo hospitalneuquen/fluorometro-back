@@ -1,16 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ProtocoloService } from '../protocolo/protocolo.service';
 import { FindProtocolosParams } from 'src/protocolo/validations';
-// dos
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Brackets,
-  createQueryBuilder,
-  LessThan,
-  LessThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { Repository } from 'typeorm';
+import * as moment from 'moment';
 
 @Injectable()
 export class OrdenTrabajoService {
@@ -37,17 +31,29 @@ export class OrdenTrabajoService {
         numeroDesde: params.numberFrom,
       });
     }
-    if (params.numberTo) {
-      query.where('numera_hasta <= :numeroHasta', {
-        numeroHasta: params.numberTo,
-      });
-    }
     return query.getMany();
   }
 
-  async canCreateWorkOrder(
-    params: FindProtocolosParams,
-  ): Promise<void> {
+  async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {
+    if (
+      params.numberTo &&
+      params.numberFrom &&
+      params.numberTo < params.numberFrom
+    )
+      throw new BadRequestException(
+        { statusCode: 400, message: 'numberFromMustBeLessThanNumberTo' },
+        'El numero de protocolo desde no puede ser mayor al numero de protocolo hasta',
+      );
+    if (moment().isSame(params.dateTo, 'day'))
+      throw new BadRequestException(
+        { statusCode: 400, message: 'dateToCannotBeToday' },
+        'La fecha hasta no puede ser la fecha de hoy (tiene que ser como maximo la fecha de ayer)',
+      );
+    if (moment(params.dateTo).isBefore(params.dateFrom))
+      throw new BadRequestException(
+        { statusCode: 400, message: 'dateFromCannotBeBeforeDateTo' },
+        'La fecha desde no puede ser anterior a la fecha hasta',
+      );
     const overlappedWorkOrders = await this.findOverlapsWith(params);
     if (overlappedWorkOrders.length > 0)
       throw new BadRequestException(
