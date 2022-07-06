@@ -20,6 +20,7 @@ describe('Workorder service unit tests', () => {
             },
           };
         }
+        return {};
       })
       .compile();
     service = module.get<ProtocoloService>(ProtocoloService);
@@ -343,6 +344,7 @@ describe('Test from getProtocolos', () => {
             },
           };
         }
+        return {};
       })
       .compile();
     service = module.get<ProtocoloService>(ProtocoloService);
