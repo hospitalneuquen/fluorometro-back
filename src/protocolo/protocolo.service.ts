@@ -12,9 +12,7 @@ export class ProtocoloService {
     @InjectConnection('sips') private readonly connection: Connection,
   ) {}
 
-  convertLaboratoryLineEntityToProtocolo(
-    order: ProtocoloLine,
-  ): Protocolo {
+  convertLaboratoryLineEntityToProtocolo(order: ProtocoloLine): Protocolo {
     const response: Protocolo = {
       ...R.omit(['item', 'cantidad'], order),
       items: [

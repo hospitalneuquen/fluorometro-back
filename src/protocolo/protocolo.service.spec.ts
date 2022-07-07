@@ -344,7 +344,11 @@ describe('Test from getProtocolos', () => {
             },
           };
         }
-        return {};
+        return {
+          query: (params: any) => {
+            return [];
+          },
+        };
       })
       .compile();
     service = module.get<ProtocoloService>(ProtocoloService);
