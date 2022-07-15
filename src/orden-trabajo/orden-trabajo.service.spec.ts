@@ -1,11 +1,14 @@
-import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as moment from 'moment';
 import { Protocolo } from 'src/entities/protocolo.entity';
 import { FindProtocolosParams } from 'src/protocolo/validations';
+import { ValidationException } from 'src/shared/errors';
 import { ProtocoloModule } from '../protocolo/protocolo.module';
 import { ProtocoloService } from '../protocolo/protocolo.service';
-import { OrdenTrabajoService } from './orden-trabajo.service';
+import {
+  OrdenTrabajoService,
+  ORDEN_VALIDATION_ERROR_CODES,
+} from './orden-trabajo.service';
 
 const TOKEN_NAME = 'sipsConnection';
 describe('OrdenTrabajoService', () => {
@@ -270,8 +273,8 @@ describe('OrdenTrabajoService', () => {
       numberTo: NUMBER_TO,
     };
     service.canCreateWorkOrder(params).catch((err) => {
-      expect(err).toBeInstanceOf(BadRequestException);
-      expect(err.message).toBe('overlapped');
+      expect(err).toBeInstanceOf(ValidationException);
+      expect(err.getCode()).toBe(ORDEN_VALIDATION_ERROR_CODES.overlapped);
     });
   });
 
@@ -288,8 +291,10 @@ describe('OrdenTrabajoService', () => {
       numberTo: NUMBER_TO,
     };
     service.canCreateWorkOrder(params).catch((err) => {
-      expect(err).toBeInstanceOf(BadRequestException);
-      expect(err.message).toBe('dateToCannotBeToday');
+      expect(err).toBeInstanceOf(ValidationException);
+      expect(err.getCode()).toBe(
+        ORDEN_VALIDATION_ERROR_CODES.dateToCannotBeToday,
+      );
     });
   });
 
@@ -306,8 +311,10 @@ describe('OrdenTrabajoService', () => {
       numberTo: NUMBER_TO,
     };
     service.canCreateWorkOrder(params).catch((err) => {
-      expect(err).toBeInstanceOf(BadRequestException);
-      expect(err.message).toBe('dateFromCannotBeBeforeDateTo');
+      expect(err).toBeInstanceOf(ValidationException);
+      expect(err.getCode()).toBe(
+        ORDEN_VALIDATION_ERROR_CODES.dateFromCannotBeBeforeDateTo,
+      );
     });
   });
 
@@ -324,8 +331,10 @@ describe('OrdenTrabajoService', () => {
       numberTo: NUMBER_TO,
     };
     service.canCreateWorkOrder(params).catch((err) => {
-      expect(err).toBeInstanceOf(BadRequestException);
-      expect(err.message).toBe('numberFromMustBeLessThanNumberTo');
+      expect(err).toBeInstanceOf(ValidationException);
+      expect(err.getCode()).toBe(
+        ORDEN_VALIDATION_ERROR_CODES.numberFromMustBeLessThanNumberTo,
+      );
     });
   });
   it('canCreateWorkOrder - validate - date_from can be equal to date_to', async () => {

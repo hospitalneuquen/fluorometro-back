@@ -1,10 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ProtocoloService } from '../protocolo/protocolo.service';
 import { FindProtocolosParams } from 'src/protocolo/validations';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ValidationException } from 'src/shared/errors';
 import * as moment from 'moment';
+
+export enum ORDEN_VALIDATION_ERROR_CODES {
+  numberFromMustBeLessThanNumberTo = 'numberFromMustBeLessThanNumberTo',
+  dateFromCannotBeBeforeDateTo = 'dateFromCannotBeBeforeDateTo',
+  dateToCannotBeToday = 'dateToCannotBeToday',
+  overlapped = 'overlapped',
+  dateFromAndDateToAreRequired = 'dateFromAndDateToAreRequired',
+}
 
 @Injectable()
 export class OrdenTrabajoService {
@@ -15,11 +24,24 @@ export class OrdenTrabajoService {
   ) {}
 
   async getProtocols(params: FindProtocolosParams) {
+    await this.canListProtocols(params);
     return this.protocoloService.getProtocolos(params);
   }
 
   async save(ordenTrabajo: OrdenTrabajo): Promise<OrdenTrabajo> {
     return this.repository.save(ordenTrabajo);
+  }
+
+  async createWorkOrder(params: FindProtocolosParams): Promise<OrdenTrabajo> {
+    const protocols = await this.getProtocols(params);
+    await this.canCreateWorkOrder(params);
+    const wo = new OrdenTrabajo();
+    wo.fecha_desde = params.dateFrom;
+    wo.fecha_hasta = params.dateTo;
+    wo.numero_desde = params.numberFrom;
+    wo.numero_hasta = params.numberTo;
+    wo.protocolos = protocols;
+    return this.save(wo);
   }
 
   findOverlapsWith(params: FindProtocolosParams): Promise<OrdenTrabajo[]> {
@@ -34,48 +56,53 @@ export class OrdenTrabajoService {
     return query.getMany();
   }
 
-  async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {
-    if (
+  private isNumberFromLessThanNumberTo(params: FindProtocolosParams): boolean {
+    return (
       params.numberTo &&
       params.numberFrom &&
       params.numberTo < params.numberFrom
-    )
-      throw new BadRequestException(
-        { statusCode: 400, message: 'numberFromMustBeLessThanNumberTo' },
-        'El numero de protocolo desde no puede ser mayor al numero de protocolo hasta',
+    );
+  }
+  private isDateToToday(params: FindProtocolosParams): boolean {
+    return moment().isSame(params.dateTo, 'day');
+  }
+  private isDateFromAfterDateTo(params: FindProtocolosParams): boolean {
+    return moment(params.dateFrom).isAfter(moment(params.dateTo));
+  }
+  async canListProtocols(params: FindProtocolosParams): Promise<void> {
+    if (!!!params.dateFrom || !!!params.dateTo)
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.dateFromAndDateToAreRequired,
+        '',
       );
-    if (moment().isSame(params.dateTo, 'day'))
-      throw new BadRequestException(
-        { statusCode: 400, message: 'dateToCannotBeToday' },
-        'La fecha hasta no puede ser la fecha de hoy (tiene que ser como maximo la fecha de ayer)',
+    if (this.isDateFromAfterDateTo(params))
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.dateFromCannotBeBeforeDateTo,
+        '',
       );
-    if (moment(params.dateTo).isBefore(params.dateFrom))
-      throw new BadRequestException(
-        { statusCode: 400, message: 'dateFromCannotBeBeforeDateTo' },
-        'La fecha desde no puede ser anterior a la fecha hasta',
+  }
+  // validar que ya no exista OT para estas fechas, numeros, protocolos
+  async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {
+    if (this.isNumberFromLessThanNumberTo(params))
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.numberFromMustBeLessThanNumberTo,
+        '',
+      );
+    if (this.isDateToToday(params))
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.dateToCannotBeToday,
+        '',
+      );
+    if (this.isDateFromAfterDateTo(params))
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.dateFromCannotBeBeforeDateTo,
+        '',
       );
     const overlappedWorkOrders = await this.findOverlapsWith(params);
     if (overlappedWorkOrders.length > 0)
-      throw new BadRequestException(
-        { statusCode: 400, message: 'overlapped' },
-        'Ya existen ordenes de trabajo generadas entre las fechas/numeros de protocolos indicados',
+      throw new ValidationException(
+        ORDEN_VALIDATION_ERROR_CODES.overlapped,
+        '',
       );
-  }
-
-  async createWorkOrder(params: FindProtocolosParams): Promise<OrdenTrabajo> {
-    try {
-      const protocols = await this.getProtocols(params);
-      // validar que ya no exista OT para estas fechas, numeros, protocolos
-      this.canCreateWorkOrder(params);
-      const wo = new OrdenTrabajo();
-      wo.fecha_desde = params.dateFrom;
-      wo.fecha_hasta = params.dateTo;
-      wo.numero_desde = params.numberFrom;
-      wo.numero_hasta = params.numberTo;
-      wo.protocolos = protocols;
-      return this.save(wo);
-    } catch (e) {
-      throw e;
-    }
   }
 }
