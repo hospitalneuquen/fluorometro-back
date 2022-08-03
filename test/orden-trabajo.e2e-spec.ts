@@ -7,13 +7,21 @@ import { SharedModule } from 'src/shared/shared.module';
 import { OrdenTrabajoService } from 'src/orden-trabajo/orden-trabajo.service';
 import { ProtocoloModule } from 'src/protocolo/protocolo.module';
 import { OrdenTrabajoController } from 'src/orden-trabajo/orden-trabajo.controller';
+import { GenericContainer } from 'testcontainers';
 
 jest.setTimeout(9000);
 
 describe('OrdenTrabajoController', () => {
   let app: NestFastifyApplication;
+  let mongoContainer;
 
   beforeAll(async () => {
+    /* mongoContainer = await new GenericContainer('mongo:4-focal')
+      .withExposedPorts(27017)
+      .withEnv('MONGO_INITDB_ROOT_USERNAME', 'user_fluorometro')
+      .withEnv('MONGO_INITDB_ROOT_PASSWORD', 'pass_fluorometro')
+      .withEnv('MONGO_INITDB_DATABASE', 'fluorometro')
+      .start(); */
     const moduleRef = await Test.createTestingModule({
       imports: [ProtocoloModule, SharedModule],
       controllers: [OrdenTrabajoController],
@@ -62,8 +70,8 @@ describe('OrdenTrabajoController', () => {
   afterAll(async () => {
     try {
       await app.close();
-    } catch(e) {
-      console.log()
+    } catch (e) {
+      console.log(e);
     }
   });
 });

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Protocolo } from 'src/entities/protocolo.entity';
-import { ProtocoloLine } from 'src/entities/protocoloLine.entity';
+import { ProtocoloLine } from 'src/entities/protocoloLine';
 import { ProtocoloService } from './protocolo.service';
 
 const TOKEN_NAME = 'sipsConnection';

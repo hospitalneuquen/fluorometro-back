@@ -28,6 +28,7 @@ import configuration from '../config/configuration';
       useFactory: (configService: ConfigService) => ({
         type: 'mongodb',
         host: configService.get('mongo.host'),
+        port: configService.get('mongo.port') || 27017,
         username: configService.get('mongo.username'),
         password: configService.get('mongo.password'),
         database: configService.get('mongo.database'),

@@ -13,7 +13,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = app.get(ConfigService);
   if (config.get('ENVIRONMENT') == 'DEV') {
     const docBuilder = new DocumentBuilder()
