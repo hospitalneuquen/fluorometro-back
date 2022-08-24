@@ -1,11 +1,25 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { Protocolo } from './protocolo.entity';
 
+@Entity()
 class WorkListItem {
-   ordenProtocolo: string;
-   analito: string;
+  @Column()
+  target: number;
+
+  @Column()
+  counts: number;
+
+  @Column()
+  concentrationMgDl: number;
+
+  @Column()
+  resultCode: string;
+
+  @Column()
+  withResults: boolean;
 }
 
+@Entity()
 export class WorkList {
   @ObjectIdColumn()
   id: ObjectID;
@@ -13,6 +27,9 @@ export class WorkList {
   @Column()
   item: string;
 
-  @Column(() => Protocolo)
-  protocolos: Protocolo[];
+  @Column()
+  withResults: boolean;
+
+  @Column(() => WorkListItem)
+  workLists: WorkListItem[];
 }

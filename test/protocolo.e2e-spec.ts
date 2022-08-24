@@ -6,7 +6,6 @@ import {
 import { SharedModule } from 'src/shared/shared.module';
 import { ProtocoloModule } from 'src/protocolo/protocolo.module';
 import { ProtocoloService } from 'src/protocolo/protocolo.service';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(() => resolve(null), ms));
@@ -14,7 +13,7 @@ function delay(ms) {
 
 describe('ProtocoloController', () => {
   let app: NestFastifyApplication;
-  let mongoContainer: StartedTestContainer;
+  // let mongoContainer: StartedTestContainer;
 
   beforeAll(async () => {
     /* mongoContainer = await new GenericContainer('mongo:4-focal')
@@ -28,13 +27,13 @@ describe('ProtocoloController', () => {
         'ro',
       )
       .withDefaultLogDriver()
-      .start();
-    const stream = await mongoContainer.logs();
+      .start(); */
+    /* const stream = await mongoContainer.logs();
     stream
       .on('data', (line) => console.log(line))
       .on('err', (err) => console.error(err))
-      .on('end', () => console.log('-----'));
-    process.env.MONGO_PORT = mongoContainer.getMappedPort(27017).toString();
+      .on('end', () => console.log('-----')); */
+    /* process.env.MONGO_PORT = mongoContainer.getMappedPort(27017).toString();
     process.env.MONGO_HOST = mongoContainer.getHost(); */
     // await delay(5000);
     // await ConfigModule.envVariablesLoade;
@@ -48,9 +47,7 @@ describe('ProtocoloController', () => {
       imports: [ProtocoloModule, SharedModule],
       providers: [ProtocoloService],
     })
-      .useMocker((token) => {
-        console.log('token', token);
-      })
+      .useMocker((token) => {})
       .compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -109,7 +106,7 @@ describe('ProtocoloController', () => {
 
   afterAll(async () => {
     try {
-      mongoContainer && mongoContainer.stop();
+      // mongoContainer && mongoContainer.stop();
       await app.close();
     } catch (e) {
       // console.log(e);

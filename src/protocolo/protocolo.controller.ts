@@ -15,7 +15,6 @@ import { FindProtocolosParams } from './validations';
 export class ProtocoloController extends BaseController {
   constructor(private readonly service: ProtocoloService) {
     super();
-    this.setValidationMessageList([]);
   }
 
   @Get()

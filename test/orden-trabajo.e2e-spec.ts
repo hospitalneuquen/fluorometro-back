@@ -7,13 +7,13 @@ import { SharedModule } from 'src/shared/shared.module';
 import { OrdenTrabajoService } from 'src/orden-trabajo/orden-trabajo.service';
 import { ProtocoloModule } from 'src/protocolo/protocolo.module';
 import { OrdenTrabajoController } from 'src/orden-trabajo/orden-trabajo.controller';
-import { GenericContainer } from 'testcontainers';
+// import { GenericContainer } from 'testcontainers';
 
-jest.setTimeout(9000);
+// jest.setTimeout(9000);
 
 describe('OrdenTrabajoController', () => {
   let app: NestFastifyApplication;
-  let mongoContainer;
+  // let mongoContainer;
 
   beforeAll(async () => {
     /* mongoContainer = await new GenericContainer('mongo:4-focal')
@@ -52,18 +52,18 @@ describe('OrdenTrabajoController', () => {
     await app.getHttpAdapter().getInstance().ready();
   });
 
-  it(`/GET workorders`, async () => {
+  it(`GET /workorders`, async () => {
     return app
       .inject({
         method: 'GET',
         url: '/workorders',
       })
       .then((result: any) => {
-        // console.log(result.body);
         expect(result.statusCode).toEqual(400);
         const payload = JSON.parse(result.payload);
         expect(payload.statusCode).toEqual(400);
-        expect(payload.messageCode).toEqual('dateFromAndDateToAreRequired');
+        expect(payload.message).toContain('dateFrom should not be empty');
+        expect(payload.message).toContain('dateTo should not be empty');
       });
   });
 

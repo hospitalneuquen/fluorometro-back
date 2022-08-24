@@ -85,7 +85,6 @@ export class ProtocoloService {
         params.sinceNumber || null,
       ],
     );
-    console.log(lines);
     return this.processWorkOrderList(lines);
   }
 }
