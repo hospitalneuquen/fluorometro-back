@@ -3,8 +3,8 @@ import { Connection } from 'typeorm';
 import { FindProtocolosParams } from './validations';
 import * as R from 'ramda';
 import { InjectConnection } from '@nestjs/typeorm';
-import { ProtocoloLine } from 'src/entities/protocoloLine.entity';
 import { Protocolo, ProtocoloItem } from 'src/entities/protocolo.entity';
+import { ProtocoloLine } from 'src/entities/protocoloLine';
 
 @Injectable()
 export class ProtocoloService {
@@ -71,12 +71,14 @@ export class ProtocoloService {
 
   async getProtocolos(params: FindProtocolosParams): Promise<Protocolo[]> {
     //LAB_GeneraHT(:@fechaDesde, :@fechaHasta, :@idHojaTrabajo, :@idEfectorSolicitante, :@idOrigen, :@idPrioridad, :@idSector, :@estado, :@numeroDesde, :@numeroHasta, :@desdeUltimoNumero)
+    const dateFrom = params.dateFrom.replace(/-/g, '');
+    const dateTo = params.dateTo.replace(/-/g, '');
     const PESQUISA_CODE = 72;
     const lines: ProtocoloLine[] = await this.connection.query(
       'EXEC LAB_GeneraHT @0, @1, @2, null, null, null, null, null, @3, @4, @5',
       [
-        params.dateFrom,
-        params.dateTo,
+        dateFrom,
+        dateTo,
         PESQUISA_CODE,
         params.numberFrom || null,
         params.numberTo || null,

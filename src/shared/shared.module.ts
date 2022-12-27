@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
+import { PruebaLaboratorio } from 'src/entities/pruebaLaboratorio.entity';
 import configuration from '../config/configuration';
 
 @Global()
@@ -28,12 +29,13 @@ import configuration from '../config/configuration';
       useFactory: (configService: ConfigService) => ({
         type: 'mongodb',
         host: configService.get('mongo.host'),
+        port: configService.get('mongo.port') || 27017,
         username: configService.get('mongo.username'),
         password: configService.get('mongo.password'),
         database: configService.get('mongo.database'),
         authSource: configService.get('mongo.authDB'),
         logging: true,
-        entities: [OrdenTrabajo],
+        entities: [OrdenTrabajo, PruebaLaboratorio],
       }),
       inject: [ConfigService],
     }),

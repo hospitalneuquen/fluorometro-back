@@ -81,7 +81,7 @@ export class OrdenTrabajoService {
         '',
       );
   }
-  // validar que ya no exista OT para estas fechas, numeros, protocolos
+
   async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {
     if (this.isNumberFromLessThanNumberTo(params))
       throw new ValidationException(
