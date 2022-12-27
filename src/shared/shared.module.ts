@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
+import { PruebaLaboratorio } from 'src/entities/pruebaLaboratorio.entity';
 import configuration from '../config/configuration';
 
 @Global()
@@ -34,7 +35,7 @@ import configuration from '../config/configuration';
         database: configService.get('mongo.database'),
         authSource: configService.get('mongo.authDB'),
         logging: true,
-        entities: [OrdenTrabajo],
+        entities: [OrdenTrabajo, PruebaLaboratorio],
       }),
       inject: [ConfigService],
     }),

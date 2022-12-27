@@ -6,6 +6,7 @@ import { SharedModule } from './shared/shared.module';
 import { HealthModule } from './health/health.module';
 import { ProtocoloModule } from './protocolo/protocolo.module';
 import { OrdenTrabajoModule } from './orden-trabajo/orden-trabajo.module';
+import { PruebasLaboratorioModule } from './pruebas-laboratorio/pruebas-laboratorio.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { OrdenTrabajoModule } from './orden-trabajo/orden-trabajo.module';
     SharedModule,
     HealthModule,
     OrdenTrabajoModule,
+    PruebasLaboratorioModule,
   ],
   controllers: [],
   providers: [AppService],

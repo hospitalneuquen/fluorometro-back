@@ -8,7 +8,6 @@ import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 
 @Module({
   imports: [
-    ProtocoloModule,
     TypeOrmModule.forFeature([OrdenTrabajo], 'fluorometro'),
   ],
   controllers: [OrdenTrabajoController],

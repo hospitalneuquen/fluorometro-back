@@ -1,5 +1,4 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
-import { Protocolo } from './protocolo.entity';
 
 @Entity()
 class WorkListItem {
