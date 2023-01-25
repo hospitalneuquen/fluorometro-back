@@ -3,7 +3,7 @@ import { ProtocoloService } from '../protocolo/protocolo.service';
 import { FindProtocolosParams } from 'src/protocolo/validations';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ObjectID, Repository } from 'typeorm';
 import { ValidationException } from 'src/shared/errors';
 import * as moment from 'moment';
 
@@ -80,6 +80,10 @@ export class OrdenTrabajoService {
         ORDEN_VALIDATION_ERROR_CODES.dateFromCannotBeBeforeDateTo,
         '',
       );
+  }
+
+  async findById(id: string): Promise<OrdenTrabajo> {
+    return this.repository.findOneBy({ id: new ObjectID(id) });
   }
 
   async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {

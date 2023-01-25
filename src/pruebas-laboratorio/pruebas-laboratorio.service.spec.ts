@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PruebaLaboratorio } from 'src/entities/pruebaLaboratorio.entity';
-import { ObjectID } from 'typeorm';
 import { PruebasLaboratorioService } from './pruebas-laboratorio.service';
 
 describe('PruebasLaboratorioService', () => {

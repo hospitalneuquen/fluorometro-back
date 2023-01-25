@@ -43,7 +43,7 @@ describe('PruebasLaboratorioController - validations', () => {
   it('validation - post codigo must be at least 3 characters', async () => {
     const body = {
       nombre: 'nombre test 1',
-      codigo: '12',
+      codigo: 'TS',
     };
     const myDtoObject = plainToInstance(CreatePruebaLaboratorioDTO, body);
     const errors = await validate(myDtoObject, {});
@@ -56,7 +56,7 @@ describe('PruebasLaboratorioController - validations', () => {
   it('validation - post must have nombre', async () => {
     const body = {
       nombre: '',
-      codigo: 'nombre',
+      codigo: 'TSH',
     };
     const myDtoObject = plainToInstance(CreatePruebaLaboratorioDTO, body);
     const errors = await validate(myDtoObject, {});
@@ -67,7 +67,7 @@ describe('PruebasLaboratorioController - validations', () => {
   it('validation - pass all validations test', async () => {
     const body = {
       nombre: 'test name',
-      codigo: '123',
+      codigo: 'TSH',
     };
     const myDtoObject = plainToInstance(CreatePruebaLaboratorioDTO, body);
     const errors = await validate(myDtoObject, {});
@@ -96,7 +96,7 @@ describe('PruebasLaboratorioController', () => {
               .mockReturnValue(Promise.resolve(mockListResponse)),
             findById: jest.fn().mockReturnValue(Promise.resolve(getObj1)),
             deleteById: jest.fn().mockReturnValue(Promise.resolve(null)),
-            save: jest
+            create: jest
               .fn()
               .mockImplementation((obj: CreatePruebaLaboratorioDTO) => {
                 const r = new PruebaLaboratorio();

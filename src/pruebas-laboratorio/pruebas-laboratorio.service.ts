@@ -19,7 +19,11 @@ export class PruebasLaboratorioService {
     return this.repository.findOneOrFail({ where: { id } });
   }
 
-  async save(obj: CreatePruebaLaboratorioDTO): Promise<PruebaLaboratorio> {
+  async findByCode(code: string): Promise<PruebaLaboratorio | undefined> {
+    return this.repository.findOneOrFail({ where: { codigo: code } });
+  }
+
+  async create(obj: CreatePruebaLaboratorioDTO): Promise<PruebaLaboratorio> {
     const entity = new PruebaLaboratorio();
     entity.codigo = obj.codigo;
     entity.nombre = obj.nombre;

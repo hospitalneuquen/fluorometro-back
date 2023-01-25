@@ -45,7 +45,7 @@ export class PruebasLaboratorioController {
   async save(
     @Body() body: CreatePruebaLaboratorioDTO,
   ): Promise<PruebaLaboratorio> {
-    return this.service.save(body);
+    return this.service.create(body);
   }
 
   @Put('/:id')

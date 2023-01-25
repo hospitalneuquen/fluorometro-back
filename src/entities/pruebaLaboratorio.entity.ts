@@ -1,5 +1,6 @@
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
+// Tipos de estudios que se pueden realizar
 @Entity()
 export class PruebaLaboratorio {
   @ObjectIdColumn()
