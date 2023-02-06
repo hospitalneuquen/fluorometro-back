@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { WorkList } from 'src/entities/workList.entity';
@@ -11,7 +10,6 @@ import { CreateWorklistDTO } from './validation';
 @Injectable()
 export class WorklistService {
   constructor(
-    private configService: ConfigService,
     private ordenTrabajoService: OrdenTrabajoService,
     @InjectRepository(WorkList, 'fluorometro')
     private repository: Repository<WorkList>,
@@ -37,8 +35,7 @@ export class WorklistService {
   }
 
   async findById(id: string): Promise<WorkList> {
-    // return this.repository.findOneOrFail({ id: new ObjectID(id) });
-    return this.repository.findOneBy({ id: new ObjectID(id) });
+    return this.repository.findOneBy({ id });
   }
 
   async existsForOrdenTrabajoAndCode(

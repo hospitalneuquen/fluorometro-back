@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectID, Repository } from 'typeorm';
 import { ValidationException } from 'src/shared/errors';
 import * as moment from 'moment';
+import * as mongoose from 'mongoose';
 
 export enum ORDEN_VALIDATION_ERROR_CODES {
   numberFromMustBeLessThanNumberTo = 'numberFromMustBeLessThanNumberTo',
@@ -82,8 +83,8 @@ export class OrdenTrabajoService {
       );
   }
 
-  async findById(id: string): Promise<OrdenTrabajo> {
-    return this.repository.findOneBy({ id: new ObjectID(id) });
+  async findById(id: string): Promise<OrdenTrabajo | undefined> {
+    return this.repository.findOneOrFail({ where: { id } });
   }
 
   async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {

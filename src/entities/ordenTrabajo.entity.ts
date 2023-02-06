@@ -1,10 +1,11 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { Protocolo } from './protocolo.entity';
+import * as mongoose from 'mongoose';
 
 @Entity()
 export class OrdenTrabajo {
   @ObjectIdColumn()
-  id: ObjectID;
+  id: string;
 
   @Column()
   fecha_desde: string;
