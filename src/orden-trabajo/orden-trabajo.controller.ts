@@ -3,7 +3,6 @@ import { Get, Query, Post } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { OrdenTrabajoService } from '../orden-trabajo/orden-trabajo.service';
 import { ListParams } from './validation';
-import { Protocolo } from 'src/entities/protocolo.entity';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { BaseController } from 'src/shared/base.controller';
 
@@ -16,12 +15,12 @@ export class OrdenTrabajoController extends BaseController {
   @Get()
   @ApiResponse({
     status: 200,
-    description: 'Protocolos ordenados por prioridad',
+    description: 'Ordenes de trabajo ordenadas por prioridad',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async getProtocolos(@Query() params: ListParams): Promise<Protocolo[]> {
+  async getWorkOrders(@Query() params: ListParams): Promise<OrdenTrabajo[]> {
     try {
-      return await this.service.getProtocols(params);
+      return await this.service.getOrdenesDeTrabajo(params);
     } catch (e) {
       this.manageResponseError(e);
     }

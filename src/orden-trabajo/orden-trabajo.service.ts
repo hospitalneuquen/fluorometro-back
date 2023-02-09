@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProtocoloService } from '../protocolo/protocolo.service';
 import { FindProtocolosParams } from 'src/protocolo/validations';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectID, Repository } from 'typeorm';
+import { EntityNotFoundError, ObjectID, Repository } from 'typeorm';
 import { ValidationException } from 'src/shared/errors';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
+import { ListParams } from './validation';
 
 export enum ORDEN_VALIDATION_ERROR_CODES {
   numberFromMustBeLessThanNumberTo = 'numberFromMustBeLessThanNumberTo',
@@ -29,6 +30,23 @@ export class OrdenTrabajoService {
     return this.protocoloService.getProtocolos(params);
   }
 
+  async getOrdenesDeTrabajo(params: ListParams) {
+    const query: any = { where: {} };
+    if (params.numberFrom) {
+      query.where.numero_desde = { $gte: params.numberFrom };
+    }
+    if (params.numberTo) {
+      query.where.numero_hasta = { $lte: params.numberTo };
+    }
+    if (params.dateFrom) {
+      query.where.fecha_desde = { $gte: params.dateFrom };
+    }
+    if (params.dateTo) {
+      query.where.fecha_hasta = { $lte: params.dateTo };
+    }
+    return this.repository.find(query);
+  }
+
   async save(ordenTrabajo: OrdenTrabajo): Promise<OrdenTrabajo> {
     return this.repository.save(ordenTrabajo);
   }
@@ -46,15 +64,19 @@ export class OrdenTrabajoService {
   }
 
   findOverlapsWith(params: FindProtocolosParams): Promise<OrdenTrabajo[]> {
-    const query = this.repository.createQueryBuilder('ordenTrabajo');
-    query.where('fecha_desde >= :fechaDesde', { fechaDesde: params.dateFrom });
-    query.where('fecha_hasta <= :fechaHasta', { fechaHasta: params.dateTo });
+    const query: any = {
+      where: {
+        fecha_desde: { $gte: params.dateFrom },
+        fecha_hasta: { $lte: params.dateTo },
+      },
+    };
     if (params.numberFrom) {
-      query.where('numero_desde >= :numeroDesde', {
-        numeroDesde: params.numberFrom,
-      });
+      query.where.numero_desde = { $gte: params.numberFrom };
     }
-    return query.getMany();
+    if (params.numberTo) {
+      query.where.numero_hasta = { $gte: params.numberTo };
+    }
+    return this.repository.find(query);
   }
 
   private isNumberFromLessThanNumberTo(params: FindProtocolosParams): boolean {
@@ -84,7 +106,9 @@ export class OrdenTrabajoService {
   }
 
   async findById(id: string): Promise<OrdenTrabajo | undefined> {
-    return this.repository.findOneOrFail({ where: { id } });
+    const data = await this.repository.findOneById(id);
+    if (!data) throw new NotFoundException();
+    return data;
   }
 
   async canCreateWorkOrder(params: FindProtocolosParams): Promise<void> {

@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { WorkList } from 'src/entities/workList.entity';
 import { OrdenTrabajoService } from 'src/orden-trabajo/orden-trabajo.service';
 import { ValidationException } from 'src/shared/errors';
-import { ObjectID, Repository } from 'typeorm';
+import { EntityNotFoundError, ObjectID, Repository } from 'typeorm';
 import { CreateWorklistDTO } from './validation';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class WorklistService {
     private ordenTrabajoService: OrdenTrabajoService,
     @InjectRepository(WorkList, 'fluorometro')
     private repository: Repository<WorkList>,
-  ) {}
+  ) { }
 
   async createFromOrdenTrabajo(dto: CreateWorklistDTO): Promise<WorkList> {
     const ot: OrdenTrabajo = await this.ordenTrabajoService.findById(
@@ -35,7 +35,12 @@ export class WorklistService {
   }
 
   async findById(id: string): Promise<WorkList> {
-    return this.repository.findOneBy({ id });
+    try {
+      return this.repository.findOneOrFail({ where: { id } });
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) throw new NotFoundException();
+      throw e;
+    }
   }
 
   async existsForOrdenTrabajoAndCode(

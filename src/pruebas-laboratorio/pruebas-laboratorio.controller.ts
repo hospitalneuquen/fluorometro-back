@@ -3,20 +3,22 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
+  Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { PruebaLaboratorio } from 'src/entities/pruebaLaboratorio.entity';
 import { PruebasLaboratorioService } from './pruebas-laboratorio.service';
-import { CreatePruebaLaboratorioDTO } from './validation';
+import { CreatePruebaLaboratorioDTO, FindOneParams } from './validation';
 
 @Controller('laboratory_tests')
 export class PruebasLaboratorioController {
-  constructor(private service: PruebasLaboratorioService) {}
+  constructor(private service: PruebasLaboratorioService) { }
 
   @Get()
   @ApiResponse({
@@ -32,8 +34,12 @@ export class PruebasLaboratorioController {
     status: 200,
     description: 'Retorna un prueba laboratorio (tsh, ...)',
   })
-  async getOne(@Param('id') id: string): Promise<PruebaLaboratorio> {
-    return this.service.findById(id);
+  async getOne(@Param() params: FindOneParams): Promise<PruebaLaboratorio> {
+    const obj = await this.service.findById(params.id);
+    if (!obj) {
+      throw new NotFoundException();
+    }
+    return obj;
   }
 
   @Post()
@@ -54,18 +60,24 @@ export class PruebasLaboratorioController {
     description: 'Actualiza la prueba de laboratorio',
   })
   async update(
-    @Param('id') id: string,
+    @Param() params: FindOneParams,
     @Body() body: CreatePruebaLaboratorioDTO,
   ): Promise<PruebaLaboratorio | undefined> {
-    return this.service.update(id, body);
+    const data = await this.service.update(params.id, body);
+    if (!data) throw new NotFoundException();
+    return data;
   }
 
   @Delete('/:id')
   @ApiResponse({
-    status: 200,
+    status: 204,
     description: 'Borra la prueba de laboratorio',
   })
-  async delete(@Param('id') id: string): Promise<any> {
-    return this.service.deleteById(id);
+  async delete(@Param() params: FindOneParams, @Res() res): Promise<any> {
+    const found = await this.service.deleteById(params.id);
+    if (!found) {
+      throw new NotFoundException();
+    }
+    res.status(204).send();
   }
 }

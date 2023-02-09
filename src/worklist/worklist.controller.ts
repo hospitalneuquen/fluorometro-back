@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { WorkList } from 'src/entities/workList.entity';
+import { ValidationException } from 'src/shared/errors';
 import { CreateWorklistDTO } from './validation';
 import { WorklistService } from './worklist.service';
 
@@ -21,8 +22,14 @@ export class WorklistController {
     description: 'Descarga Worklist en formato CSV',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  downloadWorklist(@Body() body: CreateWorklistDTO): Promise<WorkList> {
-    return this.service.createFromOrdenTrabajo(body);
-    // worklist.items.map(item => ())
+  async downloadWorklist(@Body() body: CreateWorklistDTO): Promise<WorkList> {
+    try {
+      return await this.service.createFromOrdenTrabajo(body);
+    } catch (e) {
+      if (e instanceof ValidationException) {
+        console.log(e);
+      }
+      throw e;
+    }
   }
 }

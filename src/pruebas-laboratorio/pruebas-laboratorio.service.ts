@@ -9,14 +9,14 @@ export class PruebasLaboratorioService {
   constructor(
     @InjectRepository(PruebaLaboratorio, 'fluorometro')
     private repository: Repository<PruebaLaboratorio>,
-  ) {}
+  ) { }
 
   async getPruebasLaboratorio(): Promise<PruebaLaboratorio[]> {
     return this.repository.find();
   }
 
-  async findById(id: string): Promise<PruebaLaboratorio | undefined> {
-    return this.repository.findOneOrFail({ where: { id } });
+  async findById(id: string): Promise<PruebaLaboratorio> {
+    return this.repository.findOneById(id);
   }
 
   async findByCode(code: string): Promise<PruebaLaboratorio | undefined> {
@@ -31,7 +31,7 @@ export class PruebasLaboratorioService {
   }
 
   async deleteById(id: string): Promise<any> {
-    return this.repository.delete({ id });
+    return (await this.repository.delete(id)).affected !== 0;
   }
 
   async update(
@@ -39,9 +39,10 @@ export class PruebasLaboratorioService {
     obj: CreatePruebaLaboratorioDTO,
   ): Promise<PruebaLaboratorio | undefined> {
     const entity = await this.findById(id);
+    if (!entity) return undefined;
     entity.codigo = obj.codigo;
     entity.nombre = obj.nombre;
-    await this.repository.update({ id }, entity);
+    await this.repository.update(id, entity);
     return this.findById(id);
   }
 }
