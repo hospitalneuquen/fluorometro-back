@@ -1,10 +1,12 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { OrdenTrabajo } from './ordenTrabajo.entity';
-import { Protocolo, ProtocoloItem } from './protocolo.entity';
-import * as mongoose from 'mongoose';
+import { ProtocoloItem } from './protocolo.entity';
 
 @Entity()
-class WorkListItem {
+export class WorkListItem {
+  @Column()
+  exported: boolean;
+
   @Column()
   target: number;
 
@@ -38,7 +40,6 @@ export class WorkList {
   @Column(() => WorkListItem)
   items: WorkListItem[];
 
-  // @Todo test this fn
   copyFromOrdenTrabajo(ot: OrdenTrabajo, itemCode: string) {
     this.ordenTrabajoId = ot.id;
     this.itemCode = itemCode;
@@ -60,6 +61,7 @@ export class WorkList {
             concentrationMgDl: null,
             resultCode: null,
             withResults: false,
+            exported: false,
           },
         ];
       } else {

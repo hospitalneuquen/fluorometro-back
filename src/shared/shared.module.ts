@@ -1,9 +1,11 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdenTrabajo } from 'src/entities/ordenTrabajo.entity';
 import { PruebaLaboratorio } from 'src/entities/pruebaLaboratorio.entity';
 import { WorkList } from 'src/entities/workList.entity';
+import { AllExceptionsFilter } from './CustomExceptionFilter';
 import configuration from '../config/configuration';
 
 @Global()
@@ -42,7 +44,13 @@ import configuration from '../config/configuration';
     }),
   ],
   controllers: [],
-  providers: [ConfigService],
+  providers: [
+    ConfigService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
   exports: [ConfigService],
 })
-export class SharedModule { }
+export class SharedModule {}

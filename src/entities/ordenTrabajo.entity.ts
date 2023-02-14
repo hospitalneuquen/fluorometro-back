@@ -1,6 +1,5 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { Protocolo } from './protocolo.entity';
-import * as mongoose from 'mongoose';
 
 @Entity()
 export class OrdenTrabajo {
