@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsMongoId,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateWorklistDTO {
   @ApiProperty()

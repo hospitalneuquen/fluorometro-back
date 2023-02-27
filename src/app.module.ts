@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module';
 import { ProtocoloModule } from './protocolo/protocolo.module';
 import { OrdenTrabajoModule } from './orden-trabajo/orden-trabajo.module';
 import { PruebasLaboratorioModule } from './pruebas-laboratorio/pruebas-laboratorio.module';
+import { SystemConfigModule } from './system-config/system-config.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PruebasLaboratorioModule } from './pruebas-laboratorio/pruebas-laborato
     HealthModule,
     OrdenTrabajoModule,
     PruebasLaboratorioModule,
+    SystemConfigModule,
   ],
   controllers: [],
   providers: [AppService],
